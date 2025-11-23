@@ -1,0 +1,5 @@
+[
+  { "id": 1, "usuario": "juan_mozo", "clave": "1234", "rol": "Mozo", "nombre": "Juan" },
+  { "id": 2, "usuario": "maria_mozo", "clave": "1234", "rol": "Mozo", "nombre": "Maria" },
+  { "id": 3, "usuario": "pedro_cocina", "clave": "1234", "rol": "Cocinero", "nombre": "Chef Pedro" }
+]
