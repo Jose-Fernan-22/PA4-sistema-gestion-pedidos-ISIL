@@ -1,29 +1,22 @@
 [
   {
-    "id": 1763869952104,
-    "mesa": "23d",
+    "id": 1763872027589,
+    "mesa": "21",
     "platos": [
-      "asdasd"
+      "Ceviche"
     ],
-    "estado": "En Preparación",
-    "mozoId": 1
+    "estado": "Listo para Servir",
+    "mozoId": 1,
+    "timestamp": "23:27:07"
   },
   {
-    "id": 1763869963529,
-    "mesa": "fasf",
+    "id": 1763872119959,
+    "mesa": "23",
     "platos": [
-      "dad"
+      "Arroz a la cubana"
     ],
     "estado": "En Preparación",
-    "mozoId": 1
-  },
-  {
-    "id": 1763870554803,
-    "mesa": "3",
-    "platos": [
-      "arroz con pollo"
-    ],
-    "estado": "En Preparación",
-    "mozoId": 1
+    "mozoId": 1,
+    "timestamp": "23:28:39"
   }
 ]

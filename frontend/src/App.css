@@ -1,43 +1,105 @@
-/* Contenedor de tarjetas */
-.pedidos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+:root {
+  --primary: #2563eb;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --bg: #f3f4f6;
+  --card-bg: #ffffff;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--bg);
+  margin: 0;
   padding: 20px;
 }
 
-/* Tarjeta de pedido */
-.pedido-card {
+.app-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
   background: white;
+  padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.status-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  z-index: 1000;
+}
+.online { background: var(--success); }
+.offline { background: #ef4444; }
+
+/* Cards Grid */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.pedido-card {
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   border-left: 5px solid #ccc;
-  transition: transform 0.2s;
 }
 
-.pedido-card:hover {
-  transform: translateY(-3px);
+.pedido-card.pending { border-left-color: var(--warning); }
+.pedido-card.ready { border-left-color: var(--success); opacity: 0.8; }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-/* Estados */
-.estado-preparacion {
-  border-left-color: #ffc107; /* Amarillo */
+.mesa-badge {
+  background: #1f2937;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
-.estado-listo {
-  border-left-color: #28a745; /* Verde */
-  background-color: #f0fff4;
-}
-
-/* Botones */
-button.btn-listo {
-  background-color: #28a745;
+.btn-primary {
+  background: var(--primary);
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-action {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 8px;
+  width: 100%;
   border-radius: 4px;
   cursor: pointer;
-  width: 100%;
   margin-top: 10px;
+}
+
+.input-field {
+  width: 90%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }

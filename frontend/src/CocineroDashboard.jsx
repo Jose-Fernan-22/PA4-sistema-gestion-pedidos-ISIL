@@ -1,53 +1,74 @@
 import { useState, useEffect } from 'react';
 
 function CocineroDashboard({ socket }) {
-  const [pedidosCocina, setPedidosCocina] = useState([]);
+  const [pedidos, setPedidos] = useState([]);
 
   useEffect(() => {
-    // Función auxiliar para actualizar estado local
-    const actualizarLista = (lista) => setPedidosCocina(lista);
+    const actualizarLista = (lista) => setPedidos(lista);
 
-    // ESCUCHA: Eventos que traen la lista actualizada de pedidos
+    socket.on('lista_inicial', actualizarLista);
     socket.on('pedido_creado', actualizarLista);
     socket.on('actualizacion_pedidos', actualizarLista);
-    socket.on('lista_inicial', actualizarLista);
 
     return () => {
+      socket.off('lista_inicial');
       socket.off('pedido_creado');
       socket.off('actualizacion_pedidos');
-      socket.off('lista_inicial');
     };
-  }, []);
+  }, [socket]);
 
-  const marcarListo = (idPedido) => {
-    // EMISIÓN: Informar al servidor que el plato está listo
+  const marcarListo = (id) => {
     socket.emit('actualizar_estado_pedido', {
-      idPedido,
+      idPedido: id,
       nuevoEstado: 'Listo para Servir'
     });
   };
 
+  // Filtramos para ver primero los pendientes
+  const pedidosPendientes = pedidos.filter(p => p.estado === 'En Preparación');
+  const pedidosListos = pedidos.filter(p => p.estado === 'Listo para Servir');
+
   return (
-    <div>
-      <h2>👨‍🍳 Panel de Cocina</h2>
-      <div className="lista-cocina">
-        {pedidosCocina.length === 0 ? <p>No hay pedidos pendientes.</p> : null}
-        
-        {pedidosCocina.map(pedido => (
-          <div key={pedido.id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-            <h3>Mesa: {pedido.mesa}</h3>
-            <p><strong>Platos:</strong> {pedido.platos.join(', ')}</p>
-            <p>Estado: {pedido.estado}</p>
-            
-            {pedido.estado === 'En Preparación' && (
-              <button onClick={() => marcarListo(pedido.id)}>
-                ✅ Marcar como Listo
-              </button>
-            )}
+    <div className="dashboard-cocina">
+      <h2>👨‍🍳 Comanda de Cocina</h2>
+      
+      <div className="cocina-sections">
+        <section>
+          <h3>🔥 En Preparación ({pedidosPendientes.length})</h3>
+          <div className="grid-container">
+            {pedidosPendientes.map(pedido => (
+              <div key={pedido.id} className="pedido-card pending">
+                <div className="card-header">
+                  <span className="mesa-badge">Mesa {pedido.mesa}</span>
+                </div>
+                <ul className="platos-list">
+                  {pedido.platos.map((p, i) => <li key={i}>{p}</li>)}
+                </ul>
+                <button onClick={() => marcarListo(pedido.id)} className="btn-action">
+                  ✅ Terminar Plato
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
+        </section>
+
+        <section>
+          <h3>✅ Listos para Servir ({pedidosListos.length})</h3>
+          <div className="grid-container">
+            {pedidosListos.map(pedido => (
+              <div key={pedido.id} className="pedido-card ready">
+                <div className="card-header">
+                  <span className="mesa-badge">Mesa {pedido.mesa}</span>
+                </div>
+                <ul>{pedido.platos.map((p, i) => <li key={i}>{p}</li>)}</ul>
+                <small>Esperando mozo...</small>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
 }
+
 export default CocineroDashboard;
