@@ -4,6 +4,30 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const fs = require('fs');
 
+// ... imports existentes
+const FILE_PEDIDOS = './pedidos.json';
+
+// 1. Función auxiliar para cargar pedidos al iniciar
+const cargarPedidos = () => {
+  try {
+    if (fs.existsSync(FILE_PEDIDOS)) {
+      const data = fs.readFileSync(FILE_PEDIDOS, 'utf-8');
+      return JSON.parse(data);
+    }
+    return [];
+  } catch (e) {
+    return [];
+  }
+};
+
+// 2. Función auxiliar para guardar cambios
+const guardarPedidos = (pedidos) => {
+  fs.writeFileSync(FILE_PEDIDOS, JSON.stringify(pedidos, null, 2));
+};
+
+// Inicializamos la lista desde el archivo
+let listaPedidos = cargarPedidos();
+
 const app = express();
 const servidor = http.createServer(app);
 
@@ -17,19 +41,6 @@ const io = new Server(servidor, {
 
 app.use(cors());
 app.use(express.json());
-
-// --- ESTRUCTURA DE DATOS EN MEMORIA PARA PEDIDOS ---
-// En un entorno real, esto iría a una base de datos.
-let listaPedidos = []; 
-/* Estructura de ejemplo de un pedido:
-  {
-    id: 171562938,
-    mesa: "5",
-    platos: ["Ceviche", "Arroz con Mariscos"],
-    estado: "En Preparación", // o "Listo para Servir"
-    mozoId: 1 // ID del usuario que creó el pedido para notificarle luego
-  }
-*/
 
 // --- ENDPOINT DE LOGIN (REST) ---
 app.post('/api/login', (req, res) => {
@@ -49,48 +60,27 @@ app.post('/api/login', (req, res) => {
 io.on('connection', (socket) => {
   console.log('Cliente conectado:', socket.id);
 
-  // 1. REGISTRO EN SALA PRIVADA:
-  // Cuando el usuario entra al Dashboard, envía su ID para unirse a una "sala" personal.
-  // Esto nos permite enviarle notificaciones solo a él (al Mozo específico).
-  socket.on('unirse_a_sala_usuario', (usuarioId) => {
-    socket.join(`usuario_${usuarioId}`);
-    console.log(`Usuario ${usuarioId} unido a su sala privada.`);
-  });
+  // Enviar lista inicial cargada desde archivo
+  socket.emit('lista_inicial', listaPedidos);
 
-  // 2. NUEVO PEDIDO (Mozo -> Servidor -> Cocineros):
   socket.on('crear_pedido', (nuevoPedido) => {
     listaPedidos.push(nuevoPedido);
-    
-    // Emitimos a TODOS los conectados (incluyendo cocineros) que hay un nuevo pedido
+    guardarPedidos(listaPedidos); // <--- GUARDAR EN DISCO
     io.emit('pedido_creado', listaPedidos);
   });
 
-  // 3. CAMBIO DE ESTADO (Cocinero -> Servidor -> Mozo específico):
   socket.on('actualizar_estado_pedido', ({ idPedido, nuevoEstado }) => {
     const pedido = listaPedidos.find(p => p.id === idPedido);
-    
     if (pedido) {
       pedido.estado = nuevoEstado;
-
-      // Notificar a todos para actualizar las listas visuales
+      guardarPedidos(listaPedidos); // <--- GUARDAR EN DISCO
       io.emit('actualizacion_pedidos', listaPedidos);
-
-      // NOTIFICACIÓN ESPECÍFICA AL MOZO:
-      // Si el pedido está listo, enviamos un evento SOLO a la sala del mozo que lo creó.
-      if (nuevoEstado === 'Listo para Servir') {
-        io.to(`usuario_${pedido.mozoId}`).emit('notificacion_mozo', {
-          mensaje: `¡Atención! Tu pedido de la Mesa ${pedido.mesa} está listo.`,
-          pedidoId: pedido.id
-        });
-      }
     }
   });
-
-  // Enviar lista inicial al conectarse
-  socket.emit('lista_inicial', listaPedidos);
 });
 
-const PUERTO = 3000;
-servidor.listen(PUERTO, () => {
-  console.log(`Servidor corriendo en http://localhost:${PUERTO}`);
+// Iniciar servidor
+const PORT = 3000;
+servidor.listen(PORT, () => {
+  console.log(`Servidor escuchando en http://localhost:${PORT}`);
 });

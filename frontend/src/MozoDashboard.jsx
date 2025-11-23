@@ -32,6 +32,10 @@ function MozoDashboard({ socket, usuario }) {
   };
 
   const enviarPedido = () => {
+    if (!mesa.trim() || !platos.trim()) {
+    alert("Por favor completa el número de mesa y los platos.");
+    return;
+  }
     const nuevoPedido = {
       id: Date.now(), // ID simple basado en tiempo
       mesa,
@@ -68,14 +72,22 @@ function MozoDashboard({ socket, usuario }) {
       </div>
 
       <h3>Mis Pedidos Activos</h3>
-      <ul>
+      <div className="pedidos-grid">
         {misPedidos.map(pedido => (
-          <li key={pedido.id} style={{ backgroundColor: pedido.estado === 'Listo para Servir' ? '#d4edda' : '#fff3cd' }}>
-            <strong>Mesa {pedido.mesa}:</strong> {pedido.platos.join(', ')} - 
-            <span> {pedido.estado}</span>
-          </li>
+          <div key={pedido.id} className={`pedido-card ${pedido.estado === 'Listo para Servir' ? 'estado-listo' : 'estado-preparacion'}`}>
+            <h3>Mesa {pedido.mesa}</h3>
+            <hr/>
+            <ul>
+              {pedido.platos.map((plato, i) => <li key={i}>{plato}</li>)}
+            </ul>
+            {pedido.estado !== 'Listo para Servir' && (
+              <button className="btn-listo" onClick={() => alert('Función no implementada aún')}>
+                Marcar Listo
+              </button>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

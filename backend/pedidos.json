@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1763869952104,
+    "mesa": "23d",
+    "platos": [
+      "asdasd"
+    ],
+    "estado": "En Preparación",
+    "mozoId": 1
+  },
+  {
+    "id": 1763869963529,
+    "mesa": "fasf",
+    "platos": [
+      "dad"
+    ],
+    "estado": "En Preparación",
+    "mozoId": 1
+  },
+  {
+    "id": 1763870554803,
+    "mesa": "3",
+    "platos": [
+      "arroz con pollo"
+    ],
+    "estado": "En Preparación",
+    "mozoId": 1
+  }
+]
