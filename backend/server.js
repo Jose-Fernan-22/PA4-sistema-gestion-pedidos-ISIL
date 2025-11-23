@@ -17,7 +17,7 @@ const servidor = http.createServer(app);
 // Configuración de CORS para permitir que el Frontend (Vite) se conecte
 const io = new Server(servidor, {
   cors: {
-    origin: "http://localhost:5173", // Puerto por defecto de Vite
+    origin:   "*", //"http://localhost:5173", Puerto por defecto de Vite
     methods: ["GET", "POST"]
   }
 });
@@ -129,7 +129,7 @@ io.on('connection', (socket) => {
   });
 });
 
-const PUERTO = 3000;
+const PUERTO = process.env.PORT || 3000;
 servidor.listen(PUERTO, () => {
-  console.log(`🚀 Servidor Backend corriendo en http://localhost:${PUERTO}`);
+  console.log(`🚀 Servidor Backend corriendo en puerto ${PUERTO}`);
 });
