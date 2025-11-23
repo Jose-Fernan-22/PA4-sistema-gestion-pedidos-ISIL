@@ -4,20 +4,27 @@ import Login from './Login';
 import MozoDashboard from './MozoDashboard';
 import CocineroDashboard from './CocineroDashboard';
 
-// Conexión al backend
-const socket = io('http://localhost:3000');
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 function App() {
   const [usuario, setUsuario] = useState(null);
+  const [socket, setSocket] = useState(null);
 
-  // Efecto para unir al usuario a su sala privada de notificaciones al loguearse
   useEffect(() => {
-    if (usuario) {
+    const newSocket = io(BACKEND_URL);
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (usuario && socket) {
       socket.emit('unirse_a_sala_usuario', usuario.id);
     }
-  }, [usuario]);
+  }, [usuario, socket]);
 
-  // Renderizado condicional basado en si hay usuario y su rol
   return (
     <div className="container">
       <h1>🍽️ Gestión de Pedidos Restaurante</h1>
