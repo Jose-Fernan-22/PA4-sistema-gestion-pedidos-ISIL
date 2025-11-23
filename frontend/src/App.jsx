@@ -3,10 +3,12 @@ import io from 'socket.io-client';
 import Login from './Login';
 import MozoDashboard from './MozoDashboard';
 import CocineroDashboard from './CocineroDashboard';
-import './App.css'; // Asegúrate de importar los estilos
+import './App.css'; 
 
-// Conexión única al backend
-const socket = io('http://localhost:3000');
+// Logica para detectar si estamos en local o en produccion
+const URL_BACKEND = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+// Conexión usando la variable de entorno
+const socket = io(URL_BACKEND);
 
 function App() {
   const [usuario, setUsuario] = useState(null);
